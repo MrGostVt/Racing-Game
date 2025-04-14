@@ -41,12 +41,15 @@
   border-color: aqua;
 }
 
-.CreatePage{
-  display: block;
+.ReadyButton{
   position: absolute;
-  top: 0px;
-  background-color: #04cfcf;
-  width: 75%;
-  height: 100%;
-  right: 0px;
+  width: 20vh;
+  height: 10vh;
+  background-color: rgb(150, 255, 80);
+  border: solid 2px black;
+}
+
+.ReadyButton:hover{
+  /* background-color: rgb(255, 144, 103); */
+  border: solid 2px green;
 }

@@ -3,6 +3,7 @@ import "./App.css";
 
 import Menu from "./pages/Menu";
 import CreatePage from "./pages/CreatePage";
+import TestPage from "./pages/TestPage";
 
 
 
@@ -11,17 +12,19 @@ function App() {
 
     let page = null;
     switch(activePage){
-        case 1: page = <CreatePage />; break;
+        case 1: page = <CreatePage updatePage = {updatePage} />; break;
+        case 0: page = null; break;
+        default: page = <TestPage />; break;
     }
 
-    function updatePage(){
-        console.log('200')
-        setPage(activePage === 0? 1: 0)
+    function updatePage(page = (activePage === 0? 1: 0)){
+        console.log(page);
+        setPage(page);
     }
 
     return (
         <>
-          <Menu callbacks={[() => updatePage(), () => updatePage(), () => updatePage()]}/>
+          <Menu callbacks={[() => updatePage(), () => updatePage(), () =>  {updatePage(2)}]}/>
           {page}
         </>
     );

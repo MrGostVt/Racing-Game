@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 
 const Menu = ({callbacks = []}) => {
 
-    console.log(callbacks);
     return(
         <div className="LeftSideMenu">
             <div className="UserPreview">

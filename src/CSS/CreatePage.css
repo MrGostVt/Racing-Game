@@ -1,0 +1,106 @@
+.CreatePage{
+  display: block;
+  position: absolute;
+  top: 0px;
+  background-color: #04cfcf;
+  width: 75%;
+  height: 100%;
+  right: 0px;
+}
+
+.MapChoose{
+  width: 90%;
+  height: 30vh;
+  /* background-color: aqua; */
+  position: relative;
+  margin-top: 5%;
+  margin-left: 5%;
+  font-size: 32px;
+  user-select: none;
+}
+
+#mapChooseWrapper{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  /* bottom: 0px; */
+  left: 0px;
+
+  /* background-color: antiquewhite; */
+  display: -webkit-inline-box;
+  overflow-x: auto;
+  scrollbar-color: #4d4d4d #e1ebe100;
+}
+.MapBlock{
+  position: relative;
+  background-color: #C24E4E;
+  height: 70%;
+  margin-top: 3%;
+  width: 35vh;
+  margin-left: 3%;
+  display: block;
+}
+.MapNameWrap{
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(26, 26, 26, 0.315);
+  transition: .3s;
+  display: none;
+  transition: .3s;
+}
+.MapBlock:hover>.MapNameWrap{
+  display: block;
+  transition: .3s;
+}
+.MapName{
+  position: absolute;
+  text-align:center;
+  color: #000000;
+  bottom: -10%;
+  width: 100%;
+  opacity: 1;
+}
+
+.VehicleBuild{
+  width: 90%;
+  height: 40vh;
+  /* background-color: aqua; */
+  position: relative;
+  margin-top: 5%;
+  margin-left: 5%;
+  font-size: 32px;
+  user-select: none;
+}
+.VehicleBuildPreview{
+  position: relative;
+  width: 40%;
+  left: 30%;
+  height: 100%;
+  background-color: chocolate;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ButtonsWrap{
+  position: relative;
+  width: 50%;
+  left: 25%;
+  height: 7vh;
+  
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.SmallButton{
+  position: relative;
+  width: 6vh;
+  height: 6vh;
+  border-radius: 10px;
+  background-color: crimson;
+  transition: .3s;
+}
+.SmallButton:hover{
+  background-color: darkslateblue;
+}

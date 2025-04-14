@@ -1,0 +1,89 @@
+
+.VehicleBody{
+    position: absolute;
+    width: 25vh;
+    height: 35vh;
+}
+
+.TruckFront{
+    position: relative;
+    width: 100%;
+    height: 45%;
+}
+.TruckHood{
+    position: relative;
+    background-color: brown;
+    width: 60%;
+    height: 60%;
+    left: 20%;
+}
+.TruckCab{
+    position: relative;
+    background-color: brown;
+    width: 80%;
+    height: 40%;
+    left: 10%;
+}
+
+.TruckBack{
+    position: relative;
+    width: 100%;
+    height: 55%;
+}
+.TruckBalk{
+    width: 4vh;
+    height: 100%;
+    background-color: grey;
+}
+#truckBalk1{
+    position: absolute;
+    left: 25%;
+}
+#truckBalk2{
+    position: absolute;
+    right: 25%;
+}
+.TruckHitch{
+    position: absolute;
+    width: 7vh;
+    height: 7vh;
+    bottom: 10%;
+    left: calc(100%/2 - 7vh/2);
+    background-color: rgb(65, 65, 65);
+}
+
+.Wheel{
+    position: absolute;
+    width: 2vh;
+    height: 3.5vh;
+    background-color: rgb(14, 14, 14);
+}
+
+
+.DefaultCarFront{
+    position: relative;
+    width: 100%;
+    height: 60%;
+}
+
+.DefaultCarHood{
+    position: relative;
+    background-color: brown;
+    width: 60%;
+    height: 40%;
+    left: 20%;
+}
+.DefaultCarCab{
+    position: relative;
+    background-color: brown;
+    width: 80%;
+    height: 60%;
+    left: 10%;
+}
+.DefaultCarTrunk{
+    position: relative;
+    background-color: brown;
+    width: 60%;
+    height: 20%;
+    left: 20%;
+}
