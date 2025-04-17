@@ -1,0 +1,10 @@
+
+.SpawnObject{
+    position: absolute;
+    background-color: rgba(50, 205, 50, 0.637);
+}
+
+.CircleObject{
+    position: absolute;
+    background-color: rgba(127, 255, 212, 0.63);
+}
