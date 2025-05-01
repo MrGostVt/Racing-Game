@@ -62,8 +62,10 @@ const CreatePage = ({updatePage = () => {}}) => {
             return false;
         }
 
-        updatePage(maps[choosedMap], defaultVehicles[currentVehicle]);
+        updatePage(maps[choosedMap], currentVehicle);
     }
+
+    let Vehicle = defaultVehicles[currentVehicle];
 
     return(
         <div className="CreatePage">
@@ -86,7 +88,7 @@ const CreatePage = ({updatePage = () => {}}) => {
                         width: '25vh',
                         height: '35vh',
                     }}>
-                        {defaultVehicles[currentVehicle]}
+                        <Vehicle isActive={false}/>
                     </div>
                 </div>
                 <div className="ButtonsWrap">

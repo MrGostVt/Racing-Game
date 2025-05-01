@@ -1,13 +1,26 @@
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import '../CSS/Vehicles.css'
+import Vehicle from '../Logic/Vehicle';
+import Wheel from '../Logic/Wheel';
+import { addButtonEvent } from '../Logic/Globals';
 
-const Wheel = ({wheelInfo}) => {
+const WheelComponent = ({wheelInfo}) => {
+    const [angle, setAngle] = useState(0);
+    
+    useEffect(() => {
+        function handleAngleUpdate(angle){
+            setAngle(angle);
+        }
+
+        wheelInfo.class.setTurnHandler(handleAngleUpdate);
+    },[])
+
     return(
-        <div className='Wheel' style={wheelInfo.styles}></div>
+        <div className='Wheel' style={{transform: `rotate(${angle}deg)`, ...wheelInfo.styles}}></div>
     );
 }
 
-const Truck = ({color = 'brown'}) => {
+const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, isActive = false,}) => {
     const [wheels, setWheels] = useState([
         {
             index: 0,
@@ -16,6 +29,7 @@ const Truck = ({color = 'brown'}) => {
                 top: '10%',
             },
             type: 'front',
+            class: new Wheel(),
         },
         {
             index: 1,
@@ -24,6 +38,7 @@ const Truck = ({color = 'brown'}) => {
                 top: '10%',
             },
             type: 'front',
+            class: new Wheel(),
         },
         {
             index: 2,
@@ -33,6 +48,7 @@ const Truck = ({color = 'brown'}) => {
                 width: '2.5vh',
             },
             type: 'back',
+            class: new Wheel(),
         },
         {
             index: 3,
@@ -42,6 +58,7 @@ const Truck = ({color = 'brown'}) => {
                 width: '2.5vh',
             },
             type: 'back',
+            class: new Wheel(),
         },
         {
             index: 4,
@@ -51,6 +68,7 @@ const Truck = ({color = 'brown'}) => {
                 width: '2.5vh',
             },
             type: 'back',
+            class: new Wheel(),
         },
         {
             index: 5,
@@ -60,13 +78,83 @@ const Truck = ({color = 'brown'}) => {
                 width: '2.5vh',
             },
             type: 'back',
+            class: new Wheel(),
         },
     ]);    
+    const [activity, setActivity] = useState(isActive);
+    const [dynamicStyles, setDynamicStyles] = useState({
+        left: spawnPositions.x,
+        top: spawnPositions.y,
+        transform: `rotate(${spawnPositions.rotation}deg)`,
+    });
+
+    const setVehicleStyles = (x, y, rotation) => {
+        setDynamicStyles({
+            left: `${x}px`,
+            top: `${y}px`,
+            transform: `rotate(${rotation}deg)`,
+        })
+    }
+
+    useEffect(() => {
+        const controller = new Vehicle('truck', wheels, {x: spawnPositions.x, y: spawnPositions.y}, setVehicleStyles);
+        const callbacks = [];
+        let cycle = isActive? setInterval(() => {
+            for(let callback of callbacks){
+                callback();
+            }
+        }, 60): null;
+
+        function deleteInterval(){
+            clearInterval(cycle);
+        }
+
+        const handleKeyDown = (event) => {
+            // console.log('Key down:', event.key);
+            switch(event.code){
+                case 'KeyA': callbacks[0] = () => {
+                    controller.turnLeft();
+                }; break;
+
+                case 'KeyD': callbacks[0] = () => {
+                    controller.turnRight(); 
+                }; break;
+
+
+                case 'KeyW': callbacks[0] = () => {
+                    controller.moveForward();
+                }; break;
+
+                case 'KeyS': callbacks[0] = () => {
+                    controller.moveBackward();
+                };
+            }
+        };
+    
+        const handleKeyUp = (event) => {
+            // console.log('Key up:', event.key);
+            switch(event.code){
+                case 'KeyA': callbacks.splice(0, 1); break;
+                case 'KeyD': callbacks.splice(0, 1); break; //Колесо может стопится из-за того что очищается не тот калбек.
+                case 'KeyW': callbacks.splice(0, 1); break;
+                case 'KeyS': callbacks.splice(0, 1); break;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown); 
+            document.removeEventListener('keyup' ,handleKeyUp);
+            deleteInterval();
+        }
+    }, []);
 
     return(
-        <div className='VehicleBody'>
+        <div className='VehicleBody' style={{...isActive? dynamicStyles: null}} >
             {wheels.map((val, index) => (
-                <Wheel wheelInfo = {val} key = {val.index}/>
+                <WheelComponent wheelInfo = {val} key = {val.index}/>
             ))}
             <div className='TruckFront'>
                 <div className='TruckHood' style={{backgroundColor: color}}></div>
@@ -90,6 +178,7 @@ const DefaultCar = ({color = 'brown'}) => {
                 top: '10%',
             },
             type: 'front',
+            class: new Wheel(),
         },
         {
             index: 1,
@@ -98,6 +187,7 @@ const DefaultCar = ({color = 'brown'}) => {
                 top: '10%',
             },
             type: 'front',
+            class: new Wheel(),
         },
         {
             index: 2,
@@ -107,6 +197,7 @@ const DefaultCar = ({color = 'brown'}) => {
                 width: '2.5vh',
             },
             type: 'back',
+            class: new Wheel(),
         },
         {
             index: 3,
@@ -116,6 +207,7 @@ const DefaultCar = ({color = 'brown'}) => {
                 width: '2.5vh',
             },
             type: 'back',
+            class: new Wheel(),
         },
     ]);    
 
@@ -134,4 +226,4 @@ const DefaultCar = ({color = 'brown'}) => {
     );
 }
 
-export const defaultVehicles = [<Truck />, <DefaultCar />];
+export const defaultVehicles = [Truck, DefaultCar];
