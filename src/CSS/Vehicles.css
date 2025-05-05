@@ -3,6 +3,7 @@
     position: absolute;
     width: 25vh;
     height: 35vh;
+    transition: 60ms;
 }
 
 .TruckFront{

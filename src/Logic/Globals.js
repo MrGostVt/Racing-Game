@@ -11,3 +11,5 @@ export function addButtonEvent(callback){
 export function deleteAllButtonEvents(){
     document.removeEventListener('keydown');
 }
+
+export const COLORS = ['brown', 'lightgrey', 'yellow', 'greenyellow'];

@@ -2,6 +2,7 @@ import React, { useState, useEffect, act } from "react";
 import { defaultVehicles } from "../Components/VehiclePresets";
 import '../CSS/CreatePage.css'
 import { MapLoad } from "../Logic/Maps";
+import { COLORS } from "../Logic/Globals";
 
 function getMaps() {
     const defaultTestMap = new MapLoad('TestMap','../imgs/Test-Logo.png');
@@ -26,12 +27,22 @@ const CreatePage = ({updatePage = () => {}}) => {
     const [choosedMap, setChoosedMap] = useState(-1);
     const [maps, setMaps] = useState([]);
     const [currentVehicle, setCurrentVehicle] = useState(0);
+    const [colorID, setColorID] = useState(0);
 
     useEffect(() => {
         setMaps(getMaps());
 
         return () => {};
     },[])
+
+    function updateColorID(){
+        if(colorID < COLORS.length){
+            setColorID(colorID+1);
+        }
+        else{
+            setColorID(0);
+        }
+    }
 
     function updateChoosedMap(index, callback){
         mapCallback();
@@ -62,7 +73,7 @@ const CreatePage = ({updatePage = () => {}}) => {
             return false;
         }
 
-        updatePage(maps[choosedMap], currentVehicle);
+        updatePage(maps[choosedMap], currentVehicle, colorID);
     }
 
     let Vehicle = defaultVehicles[currentVehicle];
@@ -83,12 +94,12 @@ const CreatePage = ({updatePage = () => {}}) => {
 
             <div className="VehicleBuild">
                 Build your vehicle
-                <div className="VehicleBuildPreview">
+                <div className="VehicleBuildPreview" onClick={() => updateColorID()}>
                     <div style={{
                         width: '25vh',
                         height: '35vh',
                     }}>
-                        <Vehicle isActive={false}/>
+                        <Vehicle color={COLORS[colorID]} isActive={false}/>
                     </div>
                 </div>
                 <div className="ButtonsWrap">

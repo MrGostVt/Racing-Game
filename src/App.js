@@ -7,7 +7,7 @@ import TestPage from "./pages/TestPage";
 import { MapLoaderPage } from "./pages/MapLoaderPage";
 
 let SavedInstance = {
-    vehicleObject: {},
+    vehicleObject: {id: 0, colorID: 0},
     mapObject: {},
 }
 
@@ -21,7 +21,7 @@ function App() {
         case 1: page = <CreatePage updatePage = {updatePageToMap} />; break;
         case 0: page = null; break;
         case 2: page = <MapLoaderPage mapObject={SavedInstance.mapObject} 
-            vehicleID={SavedInstance.vehicleID} />; break;
+            vehicleObject={SavedInstance.vehicleObject} />; break;
         default: page = <TestPage />; break;
     }
 
@@ -32,9 +32,11 @@ function App() {
             setMenuMutator(0);
         }
     }
-    function updatePageToMap(mapObject, vehicle){
+    function updatePageToMap(mapObject, vehicle, colorID){
         SavedInstance.mapObject = mapObject;
-        SavedInstance.vehicleID = vehicle;
+        SavedInstance.vehicleObject.id = vehicle;
+        SavedInstance.vehicleObject.colorID = colorID;
+
         setPage(2); 
         setMenuMutator(1);
     }

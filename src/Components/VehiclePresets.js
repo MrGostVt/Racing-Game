@@ -98,46 +98,69 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, is
 
     useEffect(() => {
         const controller = new Vehicle('truck', wheels, {x: spawnPositions.x, y: spawnPositions.y}, setVehicleStyles);
-        const callbacks = [];
-        let cycle = isActive? setInterval(() => {
-            for(let callback of callbacks){
-                callback();
-            }
-        }, 60): null;
 
         function deleteInterval(){
             clearInterval(cycle);
         }
 
+        const callbacks = {
+            forward: {
+                isActive: false,
+                func: () => {
+                    controller.moveForward();
+                },
+            },
+            backward: {
+                isActive: false,
+                func: () => {
+                    controller.moveBackward();
+                },
+            },
+            left: {
+                isActive: false,
+                func: () => {
+                    controller.turnLeft();
+                },
+            },
+            right: {
+                isActive: false,
+                func: () => {
+                    controller.turnRight();
+                }
+            }
+        }
+
+        let cycle = isActive? setInterval(() => {
+            for(let callback in callbacks){
+                if(callbacks[callback].isActive){
+                    callbacks[callback].func();
+                };
+            }
+            
+            controller.simulate();
+        }, 60): null;
+
         const handleKeyDown = (event) => {
             // console.log('Key down:', event.key);
             switch(event.code){
-                case 'KeyA': callbacks[0] = () => {
-                    controller.turnLeft();
-                }; break;
+                case 'KeyA': callbacks.left.isActive = true; break;
 
-                case 'KeyD': callbacks[0] = () => {
-                    controller.turnRight(); 
-                }; break;
+                case 'KeyD': callbacks.right.isActive = true; break;
 
 
-                case 'KeyW': callbacks[0] = () => {
-                    controller.moveForward();
-                }; break;
+                case 'KeyW': callbacks.forward.isActive = true; break;
 
-                case 'KeyS': callbacks[0] = () => {
-                    controller.moveBackward();
-                };
+                case 'KeyS': callbacks.backward.isActive = true; break;
             }
         };
     
         const handleKeyUp = (event) => {
             // console.log('Key up:', event.key);
             switch(event.code){
-                case 'KeyA': callbacks.splice(0, 1); break;
-                case 'KeyD': callbacks.splice(0, 1); break; //Колесо может стопится из-за того что очищается не тот калбек.
-                case 'KeyW': callbacks.splice(0, 1); break;
-                case 'KeyS': callbacks.splice(0, 1); break;
+                case 'KeyA': callbacks.left.isActive = false; break;
+                case 'KeyD': callbacks.right.isActive = false; break; //Колесо может стопится из-за того что очищается не тот калбек.
+                case 'KeyW': callbacks.forward.isActive = false; break;
+                case 'KeyS': callbacks.backward.isActive = false; break;
             }
         };
 
@@ -169,7 +192,7 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, is
     );
 }
 
-const DefaultCar = ({color = 'brown'}) => {
+const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, isActive = false,}) => {
     const [wheels, setWheels] = useState([
         {
             index: 0,
@@ -210,11 +233,103 @@ const DefaultCar = ({color = 'brown'}) => {
             class: new Wheel(),
         },
     ]);    
+    const [activity, setActivity] = useState(isActive);
+    const [dynamicStyles, setDynamicStyles] = useState({
+        left: spawnPositions.x,
+        top: spawnPositions.y,
+        transform: `rotate(${spawnPositions.rotation}deg)`,
+    });
+
+    const setVehicleStyles = (x, y, rotation) => {
+        setDynamicStyles({
+            left: `${x}px`,
+            top: `${y}px`,
+            transform: `rotate(${rotation}deg)`,
+        })
+    }
+
+    useEffect(() => {
+        const controller = new Vehicle('truck', wheels, {x: spawnPositions.x, y: spawnPositions.y}, setVehicleStyles);
+
+        function deleteInterval(){
+            clearInterval(cycle);
+        }
+
+        const callbacks = {
+            forward: {
+                isActive: false,
+                func: () => {
+                    controller.moveForward();
+                },
+            },
+            backward: {
+                isActive: false,
+                func: () => {
+                    controller.moveBackward();
+                },
+            },
+            left: {
+                isActive: false,
+                func: () => {
+                    controller.turnLeft();
+                },
+            },
+            right: {
+                isActive: false,
+                func: () => {
+                    controller.turnRight();
+                }
+            }
+        }
+
+        let cycle = isActive? setInterval(() => {
+            for(let callback in callbacks){
+                if(callbacks[callback].isActive){
+                    callbacks[callback].func();
+                };
+            }
+            
+            controller.simulate();
+        }, 60): null;
+
+        const handleKeyDown = (event) => {
+            // console.log('Key down:', event.key);
+            switch(event.code){
+                case 'KeyA': callbacks.left.isActive = true; break;
+
+                case 'KeyD': callbacks.right.isActive = true; break;
+
+
+                case 'KeyW': callbacks.forward.isActive = true; break;
+
+                case 'KeyS': callbacks.backward.isActive = true; break;
+            }
+        };
+    
+        const handleKeyUp = (event) => {
+            // console.log('Key up:', event.key);
+            switch(event.code){
+                case 'KeyA': callbacks.left.isActive = false; break;
+                case 'KeyD': callbacks.right.isActive = false; break; //Колесо может стопится из-за того что очищается не тот калбек.
+                case 'KeyW': callbacks.forward.isActive = false; break;
+                case 'KeyS': callbacks.backward.isActive = false; break;
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+        document.addEventListener('keyup', handleKeyUp);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown); 
+            document.removeEventListener('keyup' ,handleKeyUp);
+            deleteInterval();
+        }
+    }, []);
 
     return(
-        <div className='VehicleBody'>
+        <div className='VehicleBody' style={{...isActive? dynamicStyles: null}}>
             {wheels.map((val, index) => (
-                <Wheel wheelInfo = {val} key = {val.index}/>
+                <WheelComponent wheelInfo = {val} key = {val.index}/>
             ))}
             <div className='DefaultCarFront'>
                 <div className='DefaultCarHood' style={{backgroundColor: color}}></div>
