@@ -1,26 +1,9 @@
-import React, { useState, useEffect, act } from "react";
-import { defaultVehicles } from "../Components/VehiclePresets";
+import React, { useState, useEffect } from "react";
 import '../CSS/CreatePage.css'
-import { MapLoad } from "../Logic/Maps";
-import { COLORS } from "../Logic/Globals";
+import { getMaps } from "../Logic/Globals";
+import VehicleBuilder from "../Components/VehicleBuilder";
 
-function getMaps() {
-    const defaultTestMap = new MapLoad('TestMap','../imgs/Test-Logo.png');
-    defaultTestMap.setSpawn({x: '500px', y: '50px'},
-        {width: '300px', height: '200px'});
-    
-    return [
-        {id: 1, object: defaultTestMap},
-        {id: 2, object: defaultTestMap},
-        {id: 3, object: defaultTestMap},
-        {id: 4, object: defaultTestMap},
-        {id: 5, object: defaultTestMap},
-        {id: 6, object: defaultTestMap},
-        {id: 7, object: defaultTestMap},
-        {id: 8, object: defaultTestMap},
-        {id: 9, object: defaultTestMap},  
-    ];
-}
+
 
 let mapCallback = () => {};
 const CreatePage = ({updatePage = () => {}}) => {
@@ -33,16 +16,7 @@ const CreatePage = ({updatePage = () => {}}) => {
         setMaps(getMaps());
 
         return () => {};
-    },[])
-
-    function updateColorID(){
-        if(colorID < COLORS.length){
-            setColorID(colorID+1);
-        }
-        else{
-            setColorID(0);
-        }
-    }
+    },[]);
 
     function updateChoosedMap(index, callback){
         mapCallback();
@@ -54,17 +28,6 @@ const CreatePage = ({updatePage = () => {}}) => {
         setChoosedMap(maps[index].id);
         return true;
     }
-  
-    function UpdateChoosedVehicle(action = 1){ // -1, 1
-        if((currentVehicle === defaultVehicles.length-1 && action === 1) 
-            || (currentVehicle === 0 && action === -1)){
-            
-            setCurrentVehicle(action === 1? 0: defaultVehicles.length-1);
-            return;
-        }
-
-        setCurrentVehicle(currentVehicle + action);
-    }
 
     function StartGame() {
         console.log(choosedMap)
@@ -75,8 +38,6 @@ const CreatePage = ({updatePage = () => {}}) => {
 
         updatePage(maps[choosedMap], currentVehicle, colorID);
     }
-
-    let Vehicle = defaultVehicles[currentVehicle];
 
     return(
         <div className="CreatePage">
@@ -91,24 +52,9 @@ const CreatePage = ({updatePage = () => {}}) => {
                     ))}
                 </div>
             </div>
+            <VehicleBuilder sendColorID={(id) => {setColorID(id)}} sendChoosedVehicle={(id) => {setCurrentVehicle(id)}} />
 
-            <div className="VehicleBuild">
-                Build your vehicle
-                <div className="VehicleBuildPreview" onClick={() => updateColorID()}>
-                    <div style={{
-                        width: '25vh',
-                        height: '35vh',
-                    }}>
-                        <Vehicle color={COLORS[colorID]} isActive={false}/>
-                    </div>
-                </div>
-                <div className="ButtonsWrap">
-                    <div className="SmallButton" style={{marginRight: '30%'}} onClick={() => UpdateChoosedVehicle(-1)} ></div>
-                    <div className="SmallButton" style={{marginLeft: '30%'}} onClick={() => UpdateChoosedVehicle(1)}></div>
-                </div>
-            </div>
             <div className="ReadyButton" style={{bottom: '8vh', right: '8vh'}} onClick={StartGame}>
-
             </div>
         </div>
     );

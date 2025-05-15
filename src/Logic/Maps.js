@@ -1,17 +1,3 @@
-function getMapsPrews() {
-    return [
-        {id: 0, name: 'First', prev: '../imgs/Test-Logo.png'},
-        {id: 1, name: 'Second', prev: '../imgs/Test-Logo.png'},
-        {id: 2, name: 'TEST', prev: '../imgs/Test-Logo.png'},
-        {id: 3, name: 'TEST', prev: '../imgs/Test-Logo.png'},
-        {id: 4, name: 'TEST', prev: '../imgs/Test-Logo.png'},
-        {id: 5, name: 'TEST', prev: '../imgs/Test-Logo.png'},
-        {id: 6, name: 'TEST', prev: '../imgs/Test-Logo.png'},
-        {id: 7, name: 'TEST', prev: '../imgs/Test-Logo.png'},
-        {id: 8, name: 'TEST', prev: '../imgs/Test-Logo.png'},  
-    ];
-}
-
 const DEFAULTWIDTH = 300;
 const DEFAULTHEIGHT = 150;
 
