@@ -4,6 +4,7 @@
     width: 25vh;
     height: 35vh;
     transition: 60ms;
+    z-index: 5;
 }
 
 .TruckFront{

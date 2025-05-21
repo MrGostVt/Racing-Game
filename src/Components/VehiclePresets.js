@@ -2,7 +2,8 @@ import { useState, useRef, useEffect } from 'react';
 import '../CSS/Vehicles.css'
 import Vehicle from '../Logic/Vehicle';
 import Wheel from '../Logic/Wheel';
-import { addButtonEvent } from '../Logic/Globals';
+import { addButtonEvent, getVehicleInfo } from '../Logic/Globals';
+import multiplayerConnector from '../Logic/Multiplayer';
 
 const WheelComponent = ({wheelInfo}) => {
     const [angle, setAngle] = useState(0);
@@ -20,7 +21,8 @@ const WheelComponent = ({wheelInfo}) => {
     );
 }
 
-const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, isActive = false,}) => {
+const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, trigger,
+    isActive = false, isOtVeh = false, identifier = 0, isMultiplayer = false}) => {
     const [wheels, setWheels] = useState([
         {
             index: 0,
@@ -89,6 +91,15 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, is
     });
 
     const setVehicleStyles = (x, y, rotation) => {
+        if(identifier == 0 && isMultiplayer){
+            const vehicle = getVehicleInfo();
+            vehicle.left = x;
+            vehicle.top = y;
+            vehicle.angle = rotation;
+            console.log(vehicle);
+            trigger.current(1, vehicle);
+        }
+        
         setDynamicStyles({
             left: `${x}px`,
             top: `${y}px`,
@@ -97,81 +108,100 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, is
     }
 
     useEffect(() => {
-        const controller = new Vehicle('truck', wheels, {x: spawnPositions.x, y: spawnPositions.y}, setVehicleStyles);
+        let onDestroy = () => {}
+        if(!isOtVeh){
+            const controller = new Vehicle('truck', wheels, spawnPositions, setVehicleStyles);
 
-        function deleteInterval(){
-            clearInterval(cycle);
-        }
+            function deleteInterval(){
+                clearInterval(cycle);
+            }
 
-        const callbacks = {
-            forward: {
-                isActive: false,
-                func: () => {
-                    controller.moveForward();
+            const callbacks = {
+                forward: {
+                    isActive: false,
+                    func: () => {
+                        controller.moveForward();
+                    },
                 },
-            },
-            backward: {
-                isActive: false,
-                func: () => {
-                    controller.moveBackward();
+                backward: {
+                    isActive: false,
+                    func: () => {
+                        controller.moveBackward();
+                    },
                 },
-            },
-            left: {
-                isActive: false,
-                func: () => {
-                    controller.turnLeft();
+                left: {
+                    isActive: false,
+                    func: () => {
+                        controller.turnLeft();
+                    },
                 },
-            },
-            right: {
-                isActive: false,
-                func: () => {
-                    controller.turnRight();
+                right: {
+                    isActive: false,
+                    func: () => {
+                        controller.turnRight();
+                    }
                 }
             }
+
+            let cycle = isActive? setInterval(() => {
+                for(let callback in callbacks){
+                    if(callbacks[callback].isActive){
+                        callbacks[callback].func();
+                    };
+                }
+                
+                controller.simulate();
+            }, 60): null;
+
+            const handleKeyDown = (event) => {
+                // console.log('Key down:', event.key);
+                switch(event.code){
+                    case 'KeyA': callbacks.left.isActive = true; break;
+
+                    case 'KeyD': callbacks.right.isActive = true; break;
+
+
+                    case 'KeyW': callbacks.forward.isActive = true; break;
+
+                    case 'KeyS': callbacks.backward.isActive = true; break;
+                }
+            };
+        
+            const handleKeyUp = (event) => {
+                // console.log('Key up:', event.key);
+                switch(event.code){
+                    case 'KeyA': callbacks.left.isActive = false; break;
+                    case 'KeyD': callbacks.right.isActive = false; break; //Колесо может стопится из-за того что очищается не тот калбек.
+                    case 'KeyW': callbacks.forward.isActive = false; break;
+                    case 'KeyS': callbacks.backward.isActive = false; break;
+                }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+
+            onDestroy =  () => {
+                document.removeEventListener('keydown', handleKeyDown); 
+                document.removeEventListener('keyup' ,handleKeyUp);
+                deleteInterval();
+            }
         }
-
-        let cycle = isActive? setInterval(() => {
-            for(let callback in callbacks){
-                if(callbacks[callback].isActive){
-                    callbacks[callback].func();
-                };
+        else{
+            function updatePositions(socket, data){
+                for (const car of data.users) {
+                    console.log(identifier, car);
+                    if(car.userID == identifier){
+                        setVehicleStyles(car.userVehicleInfo.left, car.userVehicleInfo.top, car.userVehicleInfo.rotateAngle);
+                        break;
+                    }
+                }
             }
-            
-            controller.simulate();
-        }, 60): null;
-
-        const handleKeyDown = (event) => {
-            // console.log('Key down:', event.key);
-            switch(event.code){
-                case 'KeyA': callbacks.left.isActive = true; break;
-
-                case 'KeyD': callbacks.right.isActive = true; break;
-
-
-                case 'KeyW': callbacks.forward.isActive = true; break;
-
-                case 'KeyS': callbacks.backward.isActive = true; break;
+            multiplayerConnector.AddEvenetHandler("updatePositionsListen", updatePositions);
+            onDestroy = () => {
+                multiplayerConnector.RemoveEvent("updatePositionsListen", updatePositions);
             }
-        };
-    
-        const handleKeyUp = (event) => {
-            // console.log('Key up:', event.key);
-            switch(event.code){
-                case 'KeyA': callbacks.left.isActive = false; break;
-                case 'KeyD': callbacks.right.isActive = false; break; //Колесо может стопится из-за того что очищается не тот калбек.
-                case 'KeyW': callbacks.forward.isActive = false; break;
-                case 'KeyS': callbacks.backward.isActive = false; break;
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        document.addEventListener('keyup', handleKeyUp);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown); 
-            document.removeEventListener('keyup' ,handleKeyUp);
-            deleteInterval();
         }
+        return () => {onDestroy()}
     }, []);
 
     return(
@@ -192,7 +222,8 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, is
     );
 }
 
-const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, isActive = false,}) => {
+const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, 
+    isActive = false, isOtVeh = false, identifier = 0, trigger, isMultiplayer = false}) => {
     const [wheels, setWheels] = useState([
         {
             index: 0,
@@ -241,6 +272,14 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
     });
 
     const setVehicleStyles = (x, y, rotation) => {
+        if(identifier == 0 && isMultiplayer){
+            const vehicle = getVehicleInfo();
+            vehicle.left = x;
+            vehicle.top = y;
+            vehicle.angle = rotation;
+            trigger.current(1, vehicle);
+        }
+        
         setDynamicStyles({
             left: `${x}px`,
             top: `${y}px`,
@@ -249,81 +288,99 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
     }
 
     useEffect(() => {
-        const controller = new Vehicle('truck', wheels, {x: spawnPositions.x, y: spawnPositions.y}, setVehicleStyles);
+        let onDestroy = () => {}
+        if(!isOtVeh){
+            const controller = new Vehicle('truck', wheels, spawnPositions, setVehicleStyles);
 
-        function deleteInterval(){
-            clearInterval(cycle);
-        }
+            function deleteInterval(){
+                clearInterval(cycle);
+            }
 
-        const callbacks = {
-            forward: {
-                isActive: false,
-                func: () => {
-                    controller.moveForward();
+            const callbacks = {
+                forward: {
+                    isActive: false,
+                    func: () => {
+                        controller.moveForward();
+                    },
                 },
-            },
-            backward: {
-                isActive: false,
-                func: () => {
-                    controller.moveBackward();
+                backward: {
+                    isActive: false,
+                    func: () => {
+                        controller.moveBackward();
+                    },
                 },
-            },
-            left: {
-                isActive: false,
-                func: () => {
-                    controller.turnLeft();
+                left: {
+                    isActive: false,
+                    func: () => {
+                        controller.turnLeft();
+                    },
                 },
-            },
-            right: {
-                isActive: false,
-                func: () => {
-                    controller.turnRight();
+                right: {
+                    isActive: false,
+                    func: () => {
+                        controller.turnRight();
+                    }
                 }
             }
+
+            let cycle = isActive? setInterval(() => {
+                for(let callback in callbacks){
+                    if(callbacks[callback].isActive){
+                        callbacks[callback].func();
+                    };
+                }
+                
+                controller.simulate();
+            }, 60): null;
+
+            const handleKeyDown = (event) => {
+                // console.log('Key down:', event.key);
+                switch(event.code){
+                    case 'KeyA': callbacks.left.isActive = true; break;
+
+                    case 'KeyD': callbacks.right.isActive = true; break;
+
+
+                    case 'KeyW': callbacks.forward.isActive = true; break;
+
+                    case 'KeyS': callbacks.backward.isActive = true; break;
+                }
+            };
+        
+            const handleKeyUp = (event) => {
+                // console.log('Key up:', event.key);
+                switch(event.code){
+                    case 'KeyA': callbacks.left.isActive = false; break;
+                    case 'KeyD': callbacks.right.isActive = false; break; //Колесо может стопится из-за того что очищается не тот калбек.
+                    case 'KeyW': callbacks.forward.isActive = false; break;
+                    case 'KeyS': callbacks.backward.isActive = false; break;
+                }
+            };
+
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+
+            onDestroy =  () => {
+                document.removeEventListener('keydown', handleKeyDown); 
+                document.removeEventListener('keyup' ,handleKeyUp);
+                deleteInterval();
+            }
         }
-
-        let cycle = isActive? setInterval(() => {
-            for(let callback in callbacks){
-                if(callbacks[callback].isActive){
-                    callbacks[callback].func();
-                };
+        else{
+            function updatePositions(socket, data){
+                for (const car of data.users) {
+                    if(car.userID == identifier){
+                        setVehicleStyles(car.userVehicleInfo.left, car.userVehicleInfo.top, car.userVehicleInfo.rotateAngle);
+                        break;
+                    }
+                }
             }
-            
-            controller.simulate();
-        }, 60): null;
-
-        const handleKeyDown = (event) => {
-            // console.log('Key down:', event.key);
-            switch(event.code){
-                case 'KeyA': callbacks.left.isActive = true; break;
-
-                case 'KeyD': callbacks.right.isActive = true; break;
-
-
-                case 'KeyW': callbacks.forward.isActive = true; break;
-
-                case 'KeyS': callbacks.backward.isActive = true; break;
+            multiplayerConnector.AddEvenetHandler("updatePositionsListen", updatePositions);
+            onDestroy = () => {
+                multiplayerConnector.RemoveEvent("updatePositionsListen", updatePositions);
             }
-        };
-    
-        const handleKeyUp = (event) => {
-            // console.log('Key up:', event.key);
-            switch(event.code){
-                case 'KeyA': callbacks.left.isActive = false; break;
-                case 'KeyD': callbacks.right.isActive = false; break; //Колесо может стопится из-за того что очищается не тот калбек.
-                case 'KeyW': callbacks.forward.isActive = false; break;
-                case 'KeyS': callbacks.backward.isActive = false; break;
-            }
-        };
-
-        document.addEventListener('keydown', handleKeyDown);
-        document.addEventListener('keyup', handleKeyUp);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown); 
-            document.removeEventListener('keyup' ,handleKeyUp);
-            deleteInterval();
         }
+        return () => {onDestroy()}
     }, []);
 
     return(

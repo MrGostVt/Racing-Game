@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import '../CSS/CreatePage.css'
 import { getMaps } from "../Logic/Globals";
 import VehicleBuilder from "../Components/VehicleBuilder";
+import multiplayerConnector from "../Logic/Multiplayer";
 
 
 
@@ -11,6 +12,7 @@ const CreatePage = ({updatePage = () => {}}) => {
     const [maps, setMaps] = useState([]);
     const [currentVehicle, setCurrentVehicle] = useState(0);
     const [colorID, setColorID] = useState(0);
+    const [isMultiplayer, setMultiplayer] = useState(false);
 
     useEffect(() => {
         setMaps(getMaps());
@@ -35,8 +37,7 @@ const CreatePage = ({updatePage = () => {}}) => {
             console.log('Choose map first!')
             return false;
         }
-
-        updatePage(maps[choosedMap], currentVehicle, colorID);
+        updatePage(maps[choosedMap], currentVehicle, colorID, isMultiplayer);
     }
 
     return(
@@ -56,6 +57,8 @@ const CreatePage = ({updatePage = () => {}}) => {
 
             <div className="ReadyButton" style={{bottom: '8vh', right: '8vh'}} onClick={StartGame}>
             </div>
+            <div className="ReadyButton" style={{bottom: '22vh', right: '8vh', backgroundColor: isMultiplayer? 'lime': '#C22E4E'}}
+                onClick={() => {setMultiplayer(!isMultiplayer)}}></div>
         </div>
     );
 };

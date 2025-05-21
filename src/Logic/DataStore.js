@@ -1,17 +1,17 @@
 
 export const DataStore = {
-    async GetUserID(){
+    GetUserID(){
         const user = localStorage.getItem('userID');
         return user;
     },
-    async CheckUserID(){
+    CheckUserID(){
         const user = localStorage.getItem('userID');
-        if(!!user){
+        if(!user){
             return false;
         }
         return true;
     },
-    async SetUserID(value){
+    SetUserID(value){
         localStorage.setItem('userID', value);
     },
 }

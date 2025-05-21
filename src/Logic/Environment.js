@@ -1,3 +1,3 @@
 export const ENV = {
-    API: process.env.API || 'http://localhost:3000',
+    API: process.env.API || 'http://localhost:3001',
 };

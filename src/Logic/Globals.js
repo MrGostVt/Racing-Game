@@ -18,3 +18,12 @@ export const getMaps = () => {
         {id: 9, object: defaultTestMap},  
     ];
 }
+
+let savedVehicle = {};
+
+export const setVehicleInfo = (vehicle) =>{
+    savedVehicle = {...vehicle};
+}
+export const getVehicleInfo = (vehicle) => {
+    return savedVehicle;
+}

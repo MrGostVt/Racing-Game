@@ -47,6 +47,7 @@ export default class Vehicle{
 
         this.#startPositons = startPositons;
         this.#currentPositions = startPositons;
+        this.#bodyRotateAngle = startPositons.rotation
         this.setStyles = setStyles;
         console.log('Start positions');
         console.log(this.#currentPositions);

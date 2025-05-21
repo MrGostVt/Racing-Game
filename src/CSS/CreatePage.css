@@ -104,3 +104,41 @@
 .SmallButton:hover{
   background-color: darkslateblue;
 }
+
+
+.RoomsList{
+  margin-top: 5%;
+  margin-left: 5%;
+  position: relative;
+  display: block;
+  overflow-y: auto;
+  background-color: black;
+  height: 25%;
+  width: 90%;
+}
+.RoomsList>div{
+  position: relative;
+  display: block;
+  border: solid 4px grey;
+  width: 90%;
+  margin-left: 5%;
+  margin-top: 1%;
+  margin-bottom: 4%;
+  height: 32px;
+  color: whitesmoke;
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+}
+.JoinButton{
+  position: absolute;
+  right: 2%;
+  top: 5%;
+  background-color: green; 
+  width: 10%; 
+  height: 90%;
+  transition: .1s;
+}
+.JoinButton:hover{
+  background-color: lime;
+}
