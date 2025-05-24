@@ -74,6 +74,12 @@ export default class Vehicle{
         }
     }
 
+    SetWheelSpeed(speed){
+        for(let wheel of [...this.#frontWheels, ...this.#backWheels]){
+            wheel.class.addSpeed(speed);
+        }
+    }
+
     simulate(){
         //TODO: Make simulation function, which makes stoping more smooth; 
         if(!this.#isMoving && (this.#currentRpm !== 0 || this.#currentGear !== 0)){
@@ -96,7 +102,6 @@ export default class Vehicle{
                     this.turnRight(1);
                 }
             }
-            
 
             this.setStyles(this.#currentPositions.x, this.#currentPositions.y, this.#bodyRotateAngle);
 
@@ -110,6 +115,8 @@ export default class Vehicle{
                     else if(this.#currentGear > 0 && this.#currentRpm === 0){
                         this.#currentGear -= 1;
                         this.#currentRpm = 0;
+
+                        this.SetWheelSpeed(this.#gears[this.#currentGear]);
                     }
                     this.#isAccelerete = false;
                     // alert((-1 * 5 
@@ -136,6 +143,8 @@ export default class Vehicle{
             else if(this.#currentGear < this.#gears.length - 1 && this.#currentRpm === MAXRPM){
                 this.#currentGear += 1;
                 this.#currentRpm = 3;
+             
+                this.SetWheelSpeed(this.#gears[this.#currentGear]);
             }
         }
 

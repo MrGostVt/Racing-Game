@@ -7,17 +7,27 @@ import multiplayerConnector from '../Logic/Multiplayer';
 
 const WheelComponent = ({wheelInfo}) => {
     const [angle, setAngle] = useState(0);
+    const [currSpeed, setCurrSpeed] = useState(0);
     
     useEffect(() => {
         function handleAngleUpdate(angle){
-            setAngle(angle);
+           setAngle(angle);
+        }
+        function setSpeed(speed){
+            console.log(speed + " CurrSpeed");
+            setCurrSpeed(speed);
         }
 
         wheelInfo.class.setTurnHandler(handleAngleUpdate);
+        wheelInfo.class.setSpeedIncreaseHandler(setSpeed);
     },[])
 
-    return(
-        <div className='Wheel' style={{transform: `rotate(${angle}deg)`, ...wheelInfo.styles}}></div>
+    return(//TODO: Update speed counter (10 - (gear * 10) ) && handle stop;
+        <div className='Wheel' style={{
+            transform: `rotate(${angle}deg)`,
+            animation: `WheelForward ${currSpeed * 10}s infinite linear`,
+            ...wheelInfo.styles,
+        }}></div>
     );
 }
 
@@ -96,7 +106,6 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, tr
             vehicle.left = x;
             vehicle.top = y;
             vehicle.angle = rotation;
-            console.log(vehicle);
             trigger.current(1, vehicle);
         }
         
@@ -189,7 +198,6 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, tr
         else{
             function updatePositions(socket, data){
                 for (const car of data.users) {
-                    console.log(identifier, car);
                     if(car.userID == identifier){
                         setVehicleStyles(car.userVehicleInfo.left, car.userVehicleInfo.top, car.userVehicleInfo.rotateAngle);
                         break;
@@ -229,7 +237,7 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
             index: 0,
             styles: {
                 left: '14%',
-                top: '10%',
+                top: '18%',
             },
             type: 'front',
             class: new Wheel(),
@@ -238,7 +246,7 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
             index: 1,
             styles: {
                 right: '14%',
-                top: '10%',
+                top: '18%',
             },
             type: 'front',
             class: new Wheel(),
@@ -247,7 +255,7 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
             index: 2,
             styles: {
                 left: '14%',
-                top: '65%',
+                top: '73%',
                 width: '2.5vh',
             },
             type: 'back',
@@ -257,7 +265,7 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
             index: 3,
             styles: {
                 right: '14%',
-                top: '65%',
+                top: '73%',
                 width: '2.5vh',
             },
             type: 'back',

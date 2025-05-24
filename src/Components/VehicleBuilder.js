@@ -1,6 +1,7 @@
 import { defaultVehicles } from "../Components/VehiclePresets";
 import { COLORS } from "../Logic/Globals";
 import React, { useState, useEffect } from "react";
+import soundController from "../Logic/SondController";
 
 const VehicleBuilder = ({sendColorID = () => {}, sendChoosedVehicle = () => {}}) => {
     const [currentVehicle, setCurrentVehicle] = useState(0);
@@ -33,18 +34,20 @@ const VehicleBuilder = ({sendColorID = () => {}, sendChoosedVehicle = () => {}})
 
     return(
         <div className="VehicleBuild">
-            Build your vehicle
-            <div className="VehicleBuildPreview" onClick={() => updateColorID()}>
+            <div className="VehicleBuildPreview" onClick={() => {soundController.playSound('click'); updateColorID();}}>
                 <div style={{
                     width: '25vh',
-                    height: '35vh',
+                    height: '38vh',
+                    display: 'flex',
+                    justifyContent: 'center',
+                    alignItems: 'center',
                 }}>
                     <Vehicle color={COLORS[colorID]} isActive={false}/>
                 </div>
             </div>
             <div className="ButtonsWrap">
-                <div className="SmallButton" style={{marginRight: '30%'}} onClick={() => UpdateChoosedVehicle(-1)} ></div>
-                <div className="SmallButton" style={{marginLeft: '30%'}} onClick={() => UpdateChoosedVehicle(1)}></div>
+                <div className="SmallButton" style={{marginRight: '15vh'}} onClick={() => {soundController.playSound('click'); UpdateChoosedVehicle(-1);}} >{"<"}</div>
+                <div className="SmallButton" style={{marginLeft: '15vh'}} onClick={() => {soundController.playSound('click'); UpdateChoosedVehicle(1);}}>{">"}</div>
             </div>
         </div>
     );

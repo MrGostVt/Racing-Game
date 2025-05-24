@@ -2,6 +2,7 @@ export default class Wheel{
     actualAngle = 0;
     maxAngle = 45;
     onAngleUpdate = () => {};
+    onSpeedUpdate = () => {};
 
     constructor(){
 
@@ -10,6 +11,9 @@ export default class Wheel{
     setTurnHandler(callback = () => {}){
         this.onAngleUpdate = callback;
     }
+    setSpeedIncreaseHandler(callback = () => {}){
+        this.onSpeedUpdate = callback;
+    }
     
     //Between -45, 45
     turn(angle){
@@ -17,7 +21,7 @@ export default class Wheel{
         this.actualAngle = angle;
         this.onAngleUpdate(angle);
     }
-    addTorque(force){
-        
+    addSpeed(speed){
+        this.onSpeedUpdate(speed)
     }
 }

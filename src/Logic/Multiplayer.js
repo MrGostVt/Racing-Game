@@ -134,7 +134,7 @@ class MultiplayerConnector{
     async getRoomList(){
         const rooms = await this.#makeRequest((ENDPOINTS.getRooms), 'GET');
         if(!rooms){
-            return [];
+            return null;
         }
         
         this.rooms = rooms;
@@ -191,12 +191,17 @@ class MultiplayerConnector{
 
         console.log(request);
 
-        const result = await fetch((ENV.API + endpoint), request);
-        if(result.status >= 400){
+        try{
+            const result = await fetch((ENV.API + endpoint), request);
+            if(result.status >= 400){
+                return null;
+            }
+            return (await result.json()).payload
+        }
+        catch(err){
+            console.error(err);
             return null;
         }
-
-        return (await result.json()).payload;
     }
 }
 

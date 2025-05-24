@@ -5,23 +5,22 @@ import { defaultVehicles } from "../Components/VehiclePresets";
 import { COLORS, setVehicleInfo } from "../Logic/Globals";
 import multiplayerConnector from "../Logic/Multiplayer";
 
-export const MapLoaderPage = ({mapObject = new MapLoad, vehicleObject, isMultiplayer, isJoin = false, setLoading = () => {}}) => {
+export const MapLoaderPage = ({mapObject = new MapLoad, vehicleObject, isMultiplayer, isJoin = false, 
+    setLoading = () => {}, setTip = () => {}}) => {
     const [multiplayer, setMultiplayer] = useState(isMultiplayer);
     const [otherPlayers, setOtherPlayers] = useState([]);
 
     const evTriggerRef = useRef((a, b) => {});
     
+    console.log(mapObject);
     const spawn = mapObject.object.getBuild().spawn;
     const vehPosition = {x: parseInt(spawn.left.split('px')[0]), y: parseInt(spawn.top.split('px')[0]), rotation: 90};
     const circlePoint = mapObject.object.getBuild().circlePoint;
 
     useEffect(() => {
-        //(...data){
-        //    const [data, ot] = data
-        //}
         function UpdateOtPlayers(socket, data){
-            console.log("otPlayers");
-            console.log(data);
+            // console.log("otPlayers");
+            // console.log(data);
             setOtherPlayers(data.users);
         }
 
@@ -48,6 +47,7 @@ export const MapLoaderPage = ({mapObject = new MapLoad, vehicleObject, isMultipl
             setLoading(false);
             
             if(!room){
+                setTip("Something went wrong, offline")
                 setMultiplayer(false);
             }
             else{

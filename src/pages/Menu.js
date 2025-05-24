@@ -1,77 +1,69 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import menuService from "../Components/MenuService";
+import { Button } from "../Components/Button";
+let counter = 1;
 
-const Menu = ({callbacks = [], menuMutator = 0}) => {
+const Menu = ({callbacks = [], menuMutator = 0, }) => {
     const [menuState, setMenuState] = useState(menuMutator);
+    const [onlineButton, setOnlineButton] = useState(0);
+    const onEventRef = useRef(() => {});
 
     useEffect(() => {
         if(menuState !== menuMutator){
             setMenuState(menuMutator);
         }
     }, [menuMutator]);
+    useEffect(() => {
+        if(menuState === 1){
+            onEventRef.current = menuService.AddEvent('startGame');
+        }
+        else{
+            onEventRef.current = () => {};
+        }
+    }, [menuState])
+    let modalClass = '';
 
-    let lSideMenuClass = '';
-    let userPreviewStyles = null;
-    let isNavigationActive = false;
-    let exitButton = <div className="Button" style={{
-            backgroundColor: 'red',
-            marginTop: '50vh',
-            width: menuState === 1? '70%': '',
-            left: menuState === 1? '7.5%': '',
-        }} onClick={() => {setMenuState(0); callbacks[0]();}}></div>;
+    let multiplayerSwitch;
+    let startButton;
+    let exitButton = <Button styles={{
+            backgroundColor: '#ab1616',
+        }} onClick={() => {setMenuState(0); callbacks[0]();}} text="Exit"/>;
     
     switch (menuState) {
         case 1:
-            lSideMenuClass = "LeftSideMenuMin";
-            userPreviewStyles = {
-                position: 'relative',
-                width: '70%',
-                borderRadius: '50px',
-                left: '7.5%'
-            };
+            multiplayerSwitch = <Button styles={{
+                backgroundColor: onlineButton === 0? '#C22E4E': 'lime',
+            }} onClick={() => {setOnlineButton(onlineButton === 0? 1: 0);}} text="online"/>;
+            startButton = <Button styles={{
+                backgroundColor: '#96ff50',
+            }} onClick={() => {onEventRef.current(!!onlineButton, counter); counter = counter + 1}} text="Start"/>;
+            modalClass = "ModalMenuMin"
             break;
-        case 2: 
-            lSideMenuClass = "";
+        case 2:
+            modalClass = "ModalMenuMin"
             break;
         default:
-            isNavigationActive = true;
-            lSideMenuClass = '';
+            modalClass = ""
             exitButton = null;
             break;
     }
-
     return(
-        <div className={`LeftSideMenu ${lSideMenuClass}`} onMouseEnter={() => {
-            if(menuState === 1){
-                setMenuState(2);
-            }
-        }} onMouseLeave={() => {
-            if(menuState === 2){
-                setMenuState(1)
-            }
-        }}>
-            <div className="UserPreview" style={{...userPreviewStyles}}>
-                <div className="Icon" style={{
-                    marginLeft: '5%',
-                }}></div>
-                <div style={{
-                    fontSize: '32px',
-                    marginLeft: '5%',
-                    display: userPreviewStyles === null? '': 'none',
-                    userSelect: 'none',
-                }}>User</div>
-            </div>
-            <div className="Button" style={{
-                backgroundColor: '#72C288',
-                display: isNavigationActive? '':"none",
-            }} onClick={() => {setMenuState(0); callbacks[0]();}}></div>
-            <div className="Button" style={{
-                backgroundColor: '#F091EA',
-                display: isNavigationActive? '':"none",
-            }} onClick={() => {setMenuState(0); callbacks[1]();}}></div>
-            <div className="Button" style={{
-                backgroundColor: '#848BDC',
-                display: isNavigationActive? '':"none",
-            }} onClick={() => {setMenuState(1); callbacks[2]();}}></div>
+        <div className={`${modalClass} ModalMenu`}>
+            <div id="gamePrev"><p className="Space"/>DriveAsYouCan<p className="Space"/></div>
+            <Button styles={{
+                 backgroundColor: '#72C288',
+                 display: menuState === 0? '':"none",
+            }} onClick={() => {callbacks[0]()}} text="Start" />
+            <Button styles={{
+                 backgroundColor: '#F091EA',
+                 display: menuState === 0? '':"none",
+            }} onClick={() => {callbacks[1]();}} text="Join"/>
+            <Button styles={{
+                 backgroundColor: '#848BDC',
+                 display: menuState === 0? '':"none",
+            }} text="In Developing"/>
+            {multiplayerSwitch}
+            {startButton}
             {exitButton}
         </div>
     );

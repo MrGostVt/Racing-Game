@@ -2,8 +2,9 @@
   display: block;
   position: absolute;
   top: 0px;
-  background-color: #04cfcf;
-  width: 75%;
+  left: 0px;
+  /* background-color: #04cfcf; */
+  width: 100%;
   height: 100%;
   right: 0px;
 }
@@ -13,7 +14,7 @@
   height: 30vh;
   /* background-color: aqua; */
   position: relative;
-  margin-top: 5%;
+  margin-top: 2.5%;
   margin-left: 5%;
   font-size: 32px;
   user-select: none;
@@ -63,29 +64,34 @@
 }
 
 .VehicleBuild{
-  width: 90%;
+  width: 100%;
   height: 40vh;
-  /* background-color: aqua; */
   position: relative;
-  margin-top: 5%;
-  margin-left: 5%;
+  margin-top: 2.5%;
   font-size: 32px;
   user-select: none;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 .VehicleBuildPreview{
   position: relative;
-  width: 40%;
-  left: 30%;
+  width: 50vh;
   height: 100%;
-  background-color: chocolate;
+  /* background-color: rgb(133, 153, 126); */
+  /* backdrop-filter: blur(10px); */
+
   display: flex;
   justify-content: center;
   align-items: center;
+  border-radius: 25px;
+  background-image: url(../Pictures/pixelback.png);
 }
 .ButtonsWrap{
   position: relative;
   width: 50%;
-  left: 25%;
+  /* left: 25%; */
   height: 7vh;
   
   display: flex;
@@ -98,47 +104,61 @@
   width: 6vh;
   height: 6vh;
   border-radius: 10px;
-  background-color: crimson;
+  background-color: rgb(173, 236, 113);
   transition: .3s;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 42px;
+  font-family: 'Snowstorm', sans-serif;
 }
 .SmallButton:hover{
-  background-color: darkslateblue;
+  background-color: rgb(122, 211, 38);
 }
 
 
 .RoomsList{
-  margin-top: 5%;
-  margin-left: 5%;
+  margin-top: 2.5%;
+  margin-left: calc(50% - 27.5vw);
   position: relative;
   display: block;
   overflow-y: auto;
-  background-color: black;
-  height: 25%;
-  width: 90%;
+  background-color: rgba(108, 153, 143, 0.712);
+  height: 30vh;
+  width: 55vw;
+  border-radius: 20px;
+  background-image: url(../Pictures/pixelback.png);
 }
 .RoomsList>div{
   position: relative;
   display: block;
-  border: solid 4px grey;
+  border: solid 4px rgb(27, 27, 27);
+  /* border-radius: 10%; */
   width: 90%;
   margin-left: 5%;
   margin-top: 1%;
   margin-bottom: 4%;
   height: 32px;
   color: whitesmoke;
+
+  font-family: 'Snowstrom', sans-serif;
   font-size: 26px;
   font-weight: 700;
   text-align: center;
+  
+  background-image: url(../Pictures/tierRotated.png);
+  /* border-radius: 8%; */
 }
 .JoinButton{
   position: absolute;
-  right: 2%;
-  top: 5%;
-  background-color: green; 
-  width: 10%; 
-  height: 90%;
+  /* right: 2%; */
+  top: 0;
+  left: 0;
+  /* background-color: green;  */
+  width: 100%; 
+  height: 100%;
   transition: .1s;
 }
 .JoinButton:hover{
-  background-color: lime;
+  background-color: rgba(255, 255, 255, 0.205);
 }

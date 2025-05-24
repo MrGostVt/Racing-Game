@@ -3,8 +3,9 @@ import '../CSS/CreatePage.css'
 import { getMaps } from "../Logic/Globals";
 import VehicleBuilder from "../Components/VehicleBuilder";
 import multiplayerConnector from "../Logic/Multiplayer";
+import soundController from "../Logic/SondController";
 
-export const CreateMultiplayerPage = ({updatePage = () => {}, setLoading = () => {}}) => {
+export const MultiplayerPage = ({updatePage = () => {}, setLoading = () => {}, showTip = () => {}}) => {
     const [currentVehicle, setCurrentVehicle] = useState(0);
     const [colorID, setColorID] = useState(0);
     const [rooms, setRooms] = useState([]);
@@ -20,7 +21,12 @@ export const CreateMultiplayerPage = ({updatePage = () => {}, setLoading = () =>
             setLoading(true);
             const rooms = await multiplayerConnector.getRoomList();
             setLoading(false);
-            setRooms(rooms);
+            if(!!rooms){
+                setRooms(rooms);
+            }
+            else{
+                showTip("Something went wrong")
+            }
         }
         fetch();
     },[])
@@ -32,7 +38,7 @@ export const CreateMultiplayerPage = ({updatePage = () => {}, setLoading = () =>
                 {rooms.map(val => {
                     return(
                         <div key={val.identifier}>{`${val.identifier} ${val.usersCount}/2 live`}
-                            <div className="JoinButton" onClick={() => {if(val.usersCount < 2)StartGame(val.identifier)}}></div>
+                            <div className="JoinButton" onClick={() => {soundController.playSound('click'); if(val.usersCount < 2) StartGame(val.identifier);}}></div>
                         </div>);
                 })}
                 

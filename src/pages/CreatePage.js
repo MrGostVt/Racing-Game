@@ -1,24 +1,37 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import '../CSS/CreatePage.css'
 import { getMaps } from "../Logic/Globals";
 import VehicleBuilder from "../Components/VehicleBuilder";
 import multiplayerConnector from "../Logic/Multiplayer";
+import menuService from "../Components/MenuService";
+import soundController from "../Logic/SondController";
 
 
 
 let mapCallback = () => {};
-const CreatePage = ({updatePage = () => {}}) => {
+const CreatePage = ({updatePage = () => {}, showTip = () => {}}) => {
     const [choosedMap, setChoosedMap] = useState(-1);
     const [maps, setMaps] = useState([]);
     const [currentVehicle, setCurrentVehicle] = useState(0);
     const [colorID, setColorID] = useState(0);
     const [isMultiplayer, setMultiplayer] = useState(false);
 
+    const [eventHandler, setEventHandler] = useState(0);
+    function handle(isMultiplayer, counter){
+        setMultiplayer(isMultiplayer);
+        setEventHandler(counter);
+    }   
     useEffect(() => {
         setMaps(getMaps());
-
-        return () => {};
+        const id = menuService.Subscribe('startGame', ([isMultiplayer, counter]) => { handle(isMultiplayer, counter);})
+        return () => menuService.RemoveSubscribe('startGame', id);
     },[]);
+    useEffect(() => {
+        console.log("Trying", eventHandler);
+        if(eventHandler != 0){
+            StartGame();
+        }
+    }, [eventHandler])
 
     function updateChoosedMap(index, callback){
         mapCallback();
@@ -32,18 +45,20 @@ const CreatePage = ({updatePage = () => {}}) => {
     }
 
     function StartGame() {
-        console.log(choosedMap)
         if(choosedMap === -1){
             console.log('Choose map first!')
+            showTip('Choose map first!');
             return false;
         }
-        updatePage(maps[choosedMap], currentVehicle, colorID, isMultiplayer);
+        updatePage(maps[choosedMap], 
+            currentVehicle, colorID, 
+            isMultiplayer);
     }
 
     return(
         <div className="CreatePage">
+            <VehicleBuilder sendColorID={(id) => {setColorID(id)}} sendChoosedVehicle={(id) => {setCurrentVehicle(id)}} />
             <div className="MapChoose">
-                Choose map
                 <div id="mapChooseWrapper">
                     {maps.map((value, index) => (
                         <MapPrev mapObject = {value} changeActivity={(callback) => {
@@ -53,12 +68,12 @@ const CreatePage = ({updatePage = () => {}}) => {
                     ))}
                 </div>
             </div>
-            <VehicleBuilder sendColorID={(id) => {setColorID(id)}} sendChoosedVehicle={(id) => {setCurrentVehicle(id)}} />
-
+            
+{/* 
             <div className="ReadyButton" style={{bottom: '8vh', right: '8vh'}} onClick={StartGame}>
             </div>
             <div className="ReadyButton" style={{bottom: '22vh', right: '8vh', backgroundColor: isMultiplayer? 'lime': '#C22E4E'}}
-                onClick={() => {setMultiplayer(!isMultiplayer)}}></div>
+                onClick={() => {setMultiplayer(!isMultiplayer)}}></div> */}
         </div>
     );
 };
@@ -69,6 +84,7 @@ const MapPrev = ({mapObject, changeActivity = () => {}}) => {
     return(
         <div className="MapBlock" style={{border: isActive? 'solid 2px lime': 'solid 2px black' }}
             onClick={() => {
+                soundController.playSound('click');
                 setIsActive(changeActivity(() => {setIsActive(false);}));
             }}>
             <div className="MapNameWrap"><p className='MapName'>{mapObject.object.name}</p></div> 
