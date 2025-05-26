@@ -2,9 +2,35 @@
 .SpawnObject{
     position: absolute;
     background-color: rgba(50, 205, 50, 0.637);
+    z-index: 3;
 }
 
 .CircleObject{
     position: absolute;
     background-color: rgba(127, 255, 212, 0.63);
+}
+
+.Barrier{
+    position: absolute;
+    background-color: rgb(151, 32, 32);
+    background-image: url(../Pictures/brick-texture.png);
+    z-index: 6;
+}
+
+.CheckPoint{
+    position: absolute;
+    background-color: rgb(77, 250, 212);
+
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Snowstorm', sans-serif;
+    font-size: 32px;
+    z-index: 3;
+}
+
+.RoadTexture{
+    background-image: url(../Pictures/road-texture.png);
+    background-size: 10%;
 }

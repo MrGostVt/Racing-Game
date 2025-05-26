@@ -40,7 +40,10 @@ const Menu = ({callbacks = [], menuMutator = 0, }) => {
             modalClass = "ModalMenuMin"
             break;
         case 2:
-            modalClass = "ModalMenuMin"
+            modalClass = "ModalMenuMin";
+            break;
+        case 3:
+            modalClass = "ModalMenuMinR";
             break;
         default:
             modalClass = ""

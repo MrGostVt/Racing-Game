@@ -32,10 +32,11 @@ export default class Vehicle{
     #isAccelerete = false;
     #currentRpm = 0;
     #isMoving = false;
+    #mapController = undefined;
     currentDirection = 1; // 1-forward, -1 - backward
     // #simulation = false;
 
-    constructor(type = 'basic', wheels = [], startPositons, setStyles = () => {}){
+    constructor(type = 'basic', wheels = [], startPositons, mapController, isBaseVehicle = true, setStyles = () => {}){
         for(let wheel of wheels){
             if(wheel.type === 'front'){
                 this.#frontWheels.push(wheel);
@@ -48,9 +49,11 @@ export default class Vehicle{
         this.#startPositons = startPositons;
         this.#currentPositions = startPositons;
         this.#bodyRotateAngle = startPositons.rotation
+        this.#mapController = mapController;
         this.setStyles = setStyles;
         console.log('Start positions');
         console.log(this.#currentPositions);
+        this.isBaseVehicle = isBaseVehicle;
     }
 
     turnLeft(step = 4){
@@ -88,12 +91,12 @@ export default class Vehicle{
             const top = this.#currentPositions.y + (Math.cos(this.#bodyRotateAngle  * (3.14/180)) * ((-1 * (5
                 + this.#currentRpm * this.#gears[this.#currentGear] * STEPKOEF)) * this.currentDirection));
             
-            this.#currentPositions = {x: left, y: top};
+            let bodyAngle = this.#bodyRotateAngle;
 
             if(this.#wheelRotateAngle !== 0){
 
                 const wheelAngleKoef = this.#wheelRotateAngle / MAXANGLE * 2;
-                this.#bodyRotateAngle += (this.#wheelRotateAngle > 0) ? (+1 + wheelAngleKoef) * this.currentDirection:( -1 +wheelAngleKoef) * this.currentDirection;
+                bodyAngle += (this.#wheelRotateAngle > 0) ? (+1 + wheelAngleKoef) * this.currentDirection:( -1 +wheelAngleKoef) * this.currentDirection;
 
                 if(this.#wheelRotateAngle > 0){
                     this.turnLeft(1);
@@ -103,7 +106,23 @@ export default class Vehicle{
                 }
             }
 
-            this.setStyles(this.#currentPositions.x, this.#currentPositions.y, this.#bodyRotateAngle);
+            const rect = document.getElementById('baseVehicle').getBoundingClientRect();
+            const point = this.currentDirection === 1? this.getFrontPoint(rect): this.getBackPoint(rect);
+    
+            const isCanMove = this.#mapController.canMove(point);
+            this.#mapController.CheckPoint(point);
+
+            if(isCanMove){
+
+                this.#currentPositions = {x: left, y: top};
+                this.#bodyRotateAngle = bodyAngle;
+                this.setStyles(this.#currentPositions.x, this.#currentPositions.y, this.#bodyRotateAngle);
+            }
+            else{
+                this.#currentGear = 0;
+                this.#currentRpm = 0;
+            }
+
 
 
             if(!this.#isAccelerete){
@@ -124,7 +143,7 @@ export default class Vehicle{
                 }, 150 );
             }
         }
-
+        
         this.#isMoving = false;
     }
 
@@ -152,11 +171,14 @@ export default class Vehicle{
             + this.#currentRpm * this.#gears[this.#currentGear] * STEPKOEF)));
         const top = this.#currentPositions.y + (Math.cos(this.#bodyRotateAngle  * (3.14/180)) * (-1 * (5
             + this.#currentRpm * this.#gears[this.#currentGear] * STEPKOEF)));
-        
-        if(this.#wheelRotateAngle !== 0){
 
-            const wheelAngleKoef = this.#wheelRotateAngle / MAXANGLE * 2;
-            this.#bodyRotateAngle += (this.#wheelRotateAngle > 0) ? +1 + wheelAngleKoef: -1 +wheelAngleKoef;
+        let bodyAngle = this.#bodyRotateAngle;
+        let wheelAngle = this.#wheelRotateAngle;
+        
+        if(wheelAngle !== 0){
+
+            const wheelAngleKoef = wheelAngle / MAXANGLE * 2;
+            bodyAngle += (wheelAngle > 0) ? +1 + wheelAngleKoef: -1 +wheelAngleKoef;
 
             if(this.#wheelRotateAngle > 0){
                 this.turnLeft(1);
@@ -166,11 +188,42 @@ export default class Vehicle{
             }
         }
 
-        this.#currentPositions = {x: left, y: top};
+        const rect = document.getElementById('baseVehicle').getBoundingClientRect();
+        const frontPoint = this.getFrontPoint(rect);
+        
+        const isCanMove = this.#mapController.canMove(frontPoint);
+        this.#mapController.CheckPoint(frontPoint);
 
-        this.setStyles(this.#currentPositions.x, this.#currentPositions.y, this.#bodyRotateAngle);
-        this.#isMoving = true;
-        this.currentDirection = 1;
+        console.log(isCanMove);
+        
+        if(isCanMove){
+            this.#currentPositions = {x: left, y: top};
+            this.#bodyRotateAngle = bodyAngle;
+            this.setStyles(this.#currentPositions.x, this.#currentPositions.y, this.#bodyRotateAngle);
+            this.#isMoving = true;
+            this.currentDirection = 1;
+        }
+        else{
+            this.#currentGear = 0;
+            this.#currentRpm = 0;
+        }
+    }
+
+    getFrontPoint(rect){
+        const centerPoint = {x: (rect.right - rect.left) / 2 + rect.left, y: (rect.bottom - rect.top) / 2 + rect.top};
+        const frontPoint = {
+            x: centerPoint.x  + (Math.sin(this.#bodyRotateAngle * (3.14/180)) * rect.width/2),
+            y: centerPoint.y - (Math.cos(this.#bodyRotateAngle * (3.14/180)) * rect.width/2),
+        }
+        return frontPoint;
+    }
+    getBackPoint(rect){
+        const centerPoint = {x: (rect.right - rect.left) / 2 + rect.left, y: (rect.bottom - rect.top) / 2 + rect.top};
+        const backPoint = {
+            x: centerPoint.x - (Math.sin(this.#bodyRotateAngle * (3.14/180)) * rect.width/2),
+            y: centerPoint.y + (Math.cos(this.#bodyRotateAngle * (3.14/180)) * rect.width/2),
+        }
+        return backPoint;
     }
     moveBackward(){
 
@@ -180,24 +233,41 @@ export default class Vehicle{
         const left = this.#currentPositions.x - (Math.sin(this.#bodyRotateAngle * (3.14/180)) * 1 * 5);
         const top = this.#currentPositions.y + (Math.cos(this.#bodyRotateAngle  * (3.14/180)) * 1 * 5);
 
+        let bodyAngle = this.#bodyRotateAngle;
+        let wheelAngle = this.#wheelRotateAngle;
+
         if(this.#wheelRotateAngle !== 0){
 
-            const wheelAngleKoef = this.#wheelRotateAngle / MAXANGLE * 2;
-            this.#bodyRotateAngle += (this.#wheelRotateAngle < 0) ? +1 - wheelAngleKoef: -1 - wheelAngleKoef;
+            const wheelAngleKoef = wheelAngle / MAXANGLE * 2;
+            bodyAngle += (wheelAngle < 0) ? +1 - wheelAngleKoef: -1 - wheelAngleKoef;
 
-            if(this.#wheelRotateAngle > 0){
+            if(wheelAngle > 0){
                 this.turnLeft(1);
             }
-            else if(this.#wheelRotateAngle < 0){
+            else if(wheelAngle < 0){
                 this.turnRight(1);
             }
         }
 
-        this.#currentPositions = {x: left, y: top};
+        const rect = document.getElementById('baseVehicle').getBoundingClientRect();
+        const backPoint = this.getBackPoint(rect);
 
-        this.setStyles(this.#currentPositions.x, this.#currentPositions.y, this.#bodyRotateAngle);
-        this.#isMoving = true;
-        this.currentDirection = -1;
+        const isCanMove = this.#mapController.canMove(backPoint);
+        this.#mapController.CheckPoint(backPoint);
+        
+        console.log(isCanMove);
+        
+        if(isCanMove){
+            this.#currentPositions = {x: left, y: top};
+            this.#bodyRotateAngle = bodyAngle;
+            this.setStyles(this.#currentPositions.x, this.#currentPositions.y, this.#bodyRotateAngle);
+            this.#isMoving = true;
+            this.currentDirection = -1;
+        }
+        else{
+            this.#currentGear = 0;
+            this.#currentRpm = 0;
+        }
     }
     // constructor(backWheels = 2, enginePos = 'front', mass = 1000, power = 150, setStyles = () => {}){
 

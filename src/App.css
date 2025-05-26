@@ -78,8 +78,10 @@ body{
   top: 0;
   background-color: rgb(82, 143, 143);
   z-index: 0  ;
-  background-image: url(./Pictures/background.png);
   /* background-size: 100% 100%; */
+}
+.BackgroundMain{
+  background-image: url(./Pictures/background.png);
 }
 
 .ModalMenu{
@@ -104,6 +106,20 @@ body{
   left: 3vw;
   top: 3vw;
   /* background-color: #7c7c7c; */
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-radius: 10%;
+}
+.ModalMenuMinR{
+  /* position: absolute; */
+  width: 35vh;
+  height: 35vh;
+  left: calc(100vw - 35vh - 3vw);
+  right: 3vw;
+  top: 3vw;
+  background-color: #9b9b9b3a;
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;

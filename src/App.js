@@ -25,6 +25,11 @@ function App() {
     let page = null;
     let loadingPrev = null;
     let tipPrev = null;
+    let backgroundClass;
+    switch(activePage){
+        case 3: backgroundClass = ""; break;
+        default: backgroundClass = "BackgroundMain"; break;
+    }
     switch(activePage){
         case 1: page = <CreatePage updatePage = {updatePageToMap} showTip = {showTip} />; break;
         case 0: page = null; break;
@@ -65,7 +70,7 @@ function App() {
         SavedInstance.isJoin = isJoin;
 
         setPage(3); 
-        setMenuMutator(1);
+        setMenuMutator(3);
     }
 
     function setLoading(isLoading, isAuto = false){
@@ -99,7 +104,7 @@ function App() {
 
     return (
         <>
-          <div className="Background"></div>
+          <div className={`Background ${backgroundClass}`}></div>
           <Menu menuMutator={menuMutator}
             callbacks={[() => updatePage(), () => updatePage(2), () =>  {updatePage(SavedInstance.mapObject.object == null? 0: 3)}]}/>
           {page}

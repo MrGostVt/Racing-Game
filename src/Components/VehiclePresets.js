@@ -32,7 +32,7 @@ const WheelComponent = ({wheelInfo}) => {
 }
 
 const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, trigger,
-    isActive = false, isOtVeh = false, identifier = 0, isMultiplayer = false}) => {
+    isActive = false, isOtVeh = false, identifier = 0, isMultiplayer = false, mapController = undefined}) => {
     const [wheels, setWheels] = useState([
         {
             index: 0,
@@ -119,7 +119,7 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, tr
     useEffect(() => {
         let onDestroy = () => {}
         if(!isOtVeh){
-            const controller = new Vehicle('truck', wheels, spawnPositions, setVehicleStyles);
+            const controller = new Vehicle('truck', wheels, spawnPositions, mapController, !isOtVeh, setVehicleStyles);
 
             function deleteInterval(){
                 clearInterval(cycle);
@@ -213,7 +213,7 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, tr
     }, []);
 
     return(
-        <div className='VehicleBody' style={{...isActive? dynamicStyles: null}} >
+        <div className='VehicleBody' id={`${!isOtVeh?"baseVehicle":""}`} style={{...isActive? dynamicStyles: null}} >
             {wheels.map((val, index) => (
                 <WheelComponent wheelInfo = {val} key = {val.index}/>
             ))}
@@ -230,8 +230,8 @@ const Truck = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, tr
     );
 }
 
-const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, 
-    isActive = false, isOtVeh = false, identifier = 0, trigger, isMultiplayer = false}) => {
+const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90}, trigger,
+    isActive = false, isOtVeh = false, identifier = 0, isMultiplayer = false, mapController = undefined}) => {
     const [wheels, setWheels] = useState([
         {
             index: 0,
@@ -298,7 +298,7 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
     useEffect(() => {
         let onDestroy = () => {}
         if(!isOtVeh){
-            const controller = new Vehicle('truck', wheels, spawnPositions, setVehicleStyles);
+            const controller = new Vehicle('default', wheels, spawnPositions, mapController, !isOtVeh, setVehicleStyles);
 
             function deleteInterval(){
                 clearInterval(cycle);
@@ -392,7 +392,7 @@ const DefaultCar = ({color = 'brown', spawnPositions = {x: 0, y: 0, rotation: 90
     }, []);
 
     return(
-        <div className='VehicleBody' style={{...isActive? dynamicStyles: null}}>
+        <div className='VehicleBody' id={`${!isOtVeh?"baseVehicle":""}`} style={{...isActive? dynamicStyles: null}}>
             {wheels.map((val, index) => (
                 <WheelComponent wheelInfo = {val} key = {val.index}/>
             ))}

@@ -14,8 +14,9 @@ export const MapLoaderPage = ({mapObject = new MapLoad, vehicleObject, isMultipl
     
     console.log(mapObject);
     const spawn = mapObject.object.getBuild().spawn;
-    const vehPosition = {x: parseInt(spawn.left.split('px')[0]), y: parseInt(spawn.top.split('px')[0]), rotation: 90};
-    const circlePoint = mapObject.object.getBuild().circlePoint;
+    const other = mapObject.object.getBuild().other;
+    const vehPosition = {x: parseInt(spawn.left.split('px')[0]), y: parseInt(spawn.top.split('px')[0]), rotation: mapObject.object.spawnDirection};
+    
 
     useEffect(() => {
         function UpdateOtPlayers(socket, data){
@@ -75,7 +76,7 @@ export const MapLoaderPage = ({mapObject = new MapLoad, vehicleObject, isMultipl
     return(
         <div>
             <Vehicle color={COLORS[vehicleObject.colorID]} isActive={true} spawnPositions={vehPosition} 
-            isMultiplayer = {true} trigger={evTriggerRef}/>
+            isMultiplayer = {true} trigger={evTriggerRef} mapController = {mapObject.object}/>
             {
                 otherPlayers.map((val) => {
                     const Vehicle = defaultVehicles[val.userVehicleInfo.vehicleID];
@@ -85,7 +86,23 @@ export const MapLoaderPage = ({mapObject = new MapLoad, vehicleObject, isMultipl
                 })
             }
             <Spawn spawnObject={spawn} />
-            <Circle circleObject={circlePoint} />
+            {other.map(val => {
+                switch(val.info.type){
+                    //add OnCollision
+                    case "checkpoint": return(
+                        <CheckPoint placement={val.placement} styling={val.info.styling} info={val.info} 
+                            key={val.info.id} mapController = {mapObject.object} setTip={setTip} />
+                    );
+                    case "barrier": 
+                        return(
+                            <Barrier placement={val.placement} styling={val.info.styling} key={val.info.id}/>
+                        );
+                    default: 
+                        return(
+                            <div className={val.info.secondClass} style={{...val.placement, ...val.info.styling}} key={val.info.id}></div>
+                        );
+                }
+            })}
         </div>
     )
 };
@@ -103,5 +120,24 @@ const Circle = ({circleObject}) => {
     return(
         <div className="CircleObject" style={{...circleObject}}>
         </div>
+    );
+}
+
+const Barrier = ({placement, styling}) => {
+    return(
+        <div className="Barrier" style={{...placement, ...styling}}></div>
+    );
+}
+
+const CheckPoint = ({placement, styling, info, mapController, setTip = () => {}}) => {
+    const [isTaken, setIsTaken] = useState(false);
+
+    useEffect(() => {
+        mapController.setCallbacksForCheck(info.id,() => {setIsTaken(true);}, setTip)
+    }, []);
+
+
+    return(
+        <div className="CheckPoint" style={{...placement, ...styling, backgroundColor: isTaken? "lime": ""}}>{`Checkpoint ${info.checkpointID}`}</div>
     );
 }
